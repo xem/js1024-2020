@@ -53,7 +53,7 @@ document.write(`
 <!-- This tool takes a RegEx and a block of text and underlines all the characters of the text that matches the RegEx -->
 <!-- Four replace are needed to isolate the underlined code properly before testing the regex, to avoid false positive matches. -->
 <br><h2>Regex tester</h2>
-<tt oninput='o.innerHTML=t.value.replace(eval(r.value),"<$&</").replace(/&/g,"&\amp;").replace(/<(?!\/?)/g,"&\lt;").replace(//g,"u>")'><p id=o><p><input id=r><p><textarea id=t></textarea></tt>
+<tt oninput='o.innerHTML=t.value.replace(eval(r.value),"<$&</").replace(/&/g,"&\\amp;").replace(/<(?!\\/?)/g,"&\\lt;").replace(//g,"u>")'><p id=o><p><input id=r><p><textarea id=t></textarea></tt>
 
 <!-- Tool #6: 98-byte file-to-URI transformer -->
 <!-- Source: https://github.com/xem/MiniURI#miniregextester -->
