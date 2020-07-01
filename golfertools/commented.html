@@ -1,0 +1,92 @@
+<script>
+// Golfer tools
+// ============
+
+// This is a compilation of 9 code-golfed apps that can be useful for code-golfing.
+// The 10 apps were made by The Codegolf Team and Xem between 2013 and 2019, and are slightly altered here to optimize compression.
+// It's a no-shim entry, because no canvas is present.
+// The entry writes 10 standalone chunks of HTML in the page, along with their titles,
+// then executes a little snippet of JS to make the last two apps work properly.
+// An interesting property of the onload/oninput/onblur attributes (used in most of these tools) is that `this` is implicit when we write JS inside (`value` == `this.value`, `id` == `this.id`).
+
+document.write`
+
+<!-- center the page -->
+<center>
+
+<!-- Tool #1: 128-byte HTML minifier -->
+<!-- Source: https://github.com/xem/miniMinifier#128b-html-minifier -->
+<!-- This textarea performs two transformations on its contents when HTML code is pasted inside it: -->
+<!-- `value=value.replace(/(<!--[^]+?->|\s)+/g," ")` // replace all HTML comments and line breaks/tabs/spaces with a single space character -->
+<!-- `.replace(/ (?=<|$)|<\/[tl].>|<.p> *(<[p/])| ?\/?(>)/gi,"$1$2")` // removes every unnecessary spaces, slashes ans closing HTML tags -->
+
+<br><h2>HTML minifier</h2>
+<textarea rows=9 cols=50 oninput='value=value.replace(/(<\!--[^]+?->|\\s)+/g," ").replace(/ (?=<|$)|<\\/[tl].>|<.p> *(<[p/])| ?\\/?(>)/gi,"$1$2")'></textarea>
+
+<!-- Tool #2: 128-byte CSS minifier -->
+<!-- Source: https://github.com/xem/miniMinifier#128b-css-minifier -->
+<!-- This textarea performs two transformations on its contents when HTML code is pasted inside it: -->
+<!-- `value=value.replace(\/\*[^]+?\*\/|\s)+/g," ")` // replace all HTML comments and line breaks/tabs/spaces with a single space character -->
+<!-- `.replace(/^ |([ ;]*)([^\w:*.#% -])([ ;]*)|\*?(:) */g,"$2$4")` // removes every unnecessary spaces, semicolons, etc around CSS selectors and properties -->
+<br><h2>CSS Minifier</h2>
+<textarea rows=9 cols=50 oninput='value=value.replace(/(\\/\\*[^]+?\\*\\/|\\s)+/g," ").replace(/^ |([ ;]*)([^\\w:*.#% -])([ ;]*)|\\*?(:) */g,"$2$4")'></textarea>
+
+<!-- Tool #3: 73-byte speech synthesis -->
+<!-- Source: https://github.com/xem/miniSpeechRecognitionAndSynthesis#minispeechsynthesis -->
+<!-- Dedicated blog post: https://xem.github.io/articles/webspeech -->
+<!-- This demo shows the shortest way to trigger a speech synthesis in the browser -->
+<!-- It's presented as a text input to make it interactive, but works the same with a string -->
+<!-- `speechSynthesis.speak(newSpeechSynthesisUtterance(text))` -->
+<!-- NB: the speech is generated when the text input loses the focus, hence the dummy "go" button on the right side -->
+<br><h2>Speak</h2>
+<input onblur=speechSynthesis.speak(newSpeechSynthesisUtterance(value))><button>ok</button>
+
+<!-- Tool #4: 33-byte keyCode finder -->
+<!-- Source: https://github.com/xem/miniKeyCode#minikeycode -->
+<!-- This tool helps retrieving the keyCode of the last key pressed inside the text input -->
+<!-- The property read is `which`, because it's equal to `keyCode` but shorter to write -->
+<br><h2>KeyCode</h2>
+<input onkeyup=value=event.which>
+
+<!-- Tool #5: 170-byte regex tester -->
+<!-- Source: https://github.com/xem/MiniRegexTester#miniregextester -->
+<!-- This tool takes a RegEx and a block of text and underlines all the characters of the text that matches the RegEx -->
+<!-- Four `replace` are needed to isolate the underlined code properly before testing the regex, to avoid false positive matches. -->
+<br><h2>Regex tester</h2>
+<tt oninput='o.innerHTML=t.value.replace(eval(r.value),"<$&</").replace(/&/g,"&\amp;").replace(/<(?!\/?)/g,"&\lt;").replace(//g,"u>")'><p id=o><p><input id=r><p><textarea id=t></textarea></tt>
+
+<!-- Tool #6: 98-byte file-to-URI transformer -->
+<!-- Source: https://github.com/xem/MiniURI#miniregextester -->
+<!-- This tool shows the shortest way to transform a file (obtained via a file input here) in a base64 URI -->
+<br><h2>File to URI</h2>
+<input onchange='with(new FileReader)readAsDataURL(files[0]),onload=s=>outerHTML="<textarea>"+result'type=file>
+
+<!-- Tool #7: 234-byte hex viewer -->
+<!-- Source: https://github.com/xem/hex -->
+<!-- This tool shows the shortest way to transform a file (obtained via a file input here) in hexadecimal -->
+<!-- To make the output easier to read, each line contains 16 bytes, and a left column tells the address of the first item of each line -->
+<br><h2>File to hex</h2>
+<input onchange='h="<pre>";with(new FileReader)readAsArrayBuffer(files[0]),onload=s=>{for(i in u=new Uint8Array(result))h+=(i%16?" ":"<br>"+(1e7+(+i).toString(16)).slice(-8)+" | ")+(0+u[i].toString(16)).slice(-2);outerHTML=h}'type=file><br>
+
+<!-- Tool #8: a 89-byte post-it with persistence -->
+<!-- Source: https://github.com/xem/postit/ -->
+<!-- This textarea saves its content in `localStorage.Postit` when something is typed or pasted inside it -->
+<!-- A line of JS is present below to fill it with the persistent value on load -->
+<h2>Postit</h2>
+<textarea rows=9 cols=50 id=b oninput=localStorage.Postit=value></textarea>
+
+<!-- Tool #9: 142-byte HTML/CSS/JS playground -->
+<!-- Source: https://xem.github.io/miniCodeEditor/ -->
+<!-- This tool shows an iframe `f` and 3 textareas (html, css and js, which are generated by the code below) -->
+<br><h2>Fiddle</h2>
+<iframe id=f>`;
+
+// Back to JavaScript
+
+// Fill the post-it textarea with the value stored in localStorage
+b.innerHTML=localStorage.Postit;
+
+// Create the 3 textareas of the Fiddle tool (html, css, js)
+// Each of them triggers a re-render of the iframe `f` when code is typed or pasted inside, using this model:
+// `f.srcdoc=${HTML}<script>${JS}</script><style>${CSS}`
+for(i=3;i--;)f.outerHTML+="<textarea placeholder='"+["html","css","js"][i]+"'rows=9 oninput='f["+i+"]=value;f.srcdoc=f[0]+\"<script>\"+f[2]+\"<\/script><style>\"+f[1]'>"
